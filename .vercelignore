@@ -1,9 +1,5 @@
-# Ignore server routes to prevent auto-detection as functions
-server/routes/
-server/services/
-server/utils/
-server/websocket/
-server/db/
+# Ignore entire server directory to prevent auto-detection as functions
+server/
 
 # Development files
 .env
