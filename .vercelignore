@@ -1,8 +1,13 @@
 # Ignore entire server directory to prevent auto-detection as functions
 server/
 
-# Ignore Electron-specific files
-src/ipc/
+# Ignore Electron-specific files (but keep ipc_client.ts which is used by web version)
+src/ipc/handlers/
+src/ipc/utils/
+src/ipc/processors/
+src/ipc/types/
+src/ipc_host.ts
+src/ipc_types.ts
 src/db/
 src/backup_manager.ts
 src/main.ts
