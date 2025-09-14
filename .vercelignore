@@ -1,6 +1,42 @@
 # Ignore entire server directory to prevent auto-detection as functions
 server/
 
+# Ignore Electron-specific files
+src/ipc/
+src/db/
+src/backup_manager.ts
+src/main.ts
+src/preload.ts
+
+# Ignore Node.js worker files
+workers/
+shared/
+
+# Ignore test files
+e2e-tests/
+src/__tests__/
+*.test.ts
+*.spec.ts
+
+# Ignore Electron build files
+forge.config.ts
+vite.main.config.mts
+vite.preload.config.mts
+vite.worker.config.mts
+
+# Ignore database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore temporary files
+.tmp/
+temp/
+
 # Development files
 .env
 .env.local

@@ -1,19 +1,36 @@
-// Vercel API endpoint - Proxy to our Express server functionality
-const { initializeDatabase } = require('../server/db/index.js');
+// Vercel API endpoint - Simple web API without server dependencies
 
-let db = null;
+// Mock data for web version
+const mockApps = [
+  {
+    id: 1,
+    name: 'Sample App',
+    description: 'A sample application',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
 
-// Initialize database on first request
-async function initDb() {
-  if (!db) {
-    try {
-      db = await initializeDatabase();
-    } catch (error) {
-      console.error('Failed to initialize database:', error);
+const mockSettings = {
+  selectedModel: {
+    name: 'gpt-4o-mini',
+    provider: 'openai'
+  },
+  providerSettings: {
+    openai: {
+      apiKey: {
+        value: process.env.OPENAI_API_KEY || '',
+        encryptionType: 'plaintext'
+      }
+    },
+    anthropic: {
+      apiKey: {
+        value: process.env.ANTHROPIC_API_KEY || '',
+        encryptionType: 'plaintext'
+      }
     }
   }
-  return db;
-}
+};
 
 module.exports = async (req, res) => {
   // Set CORS headers
@@ -27,9 +44,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Initialize database
-    await initDb();
-
     // Basic health check
     if (req.url === '/api/health' && req.method === 'GET') {
       return res.status(200).json({ 
@@ -43,42 +57,13 @@ module.exports = async (req, res) => {
     const path = req.url.replace('/api/', '');
     
     if (path === 'apps' && req.method === 'GET') {
-      // Mock apps response for now
       return res.status(200).json({
-        apps: [
-          {
-            id: 1,
-            name: 'Sample App',
-            description: 'A sample application',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
-        ]
+        apps: mockApps
       });
     }
 
     if (path === 'settings' && req.method === 'GET') {
-      // Mock settings response
-      return res.status(200).json({
-        selectedModel: {
-          name: 'gpt-4o-mini',
-          provider: 'openai'
-        },
-        providerSettings: {
-          openai: {
-            apiKey: {
-              value: process.env.OPENAI_API_KEY || '',
-              encryptionType: 'plaintext'
-            }
-          },
-          anthropic: {
-            apiKey: {
-              value: process.env.ANTHROPIC_API_KEY || '',
-              encryptionType: 'plaintext'
-            }
-          }
-        }
-      });
+      return res.status(200).json(mockSettings);
     }
 
     // Default response for unhandled routes
