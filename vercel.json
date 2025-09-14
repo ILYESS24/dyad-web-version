@@ -9,14 +9,12 @@
         "installCommand": "npm ci",
         "buildCommand": "npm run vercel-build"
       }
+    },
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
     }
   ],
-  "functions": {
-    "api/index.js": {
-      "runtime": "@vercel/node@3",
-      "maxDuration": 30
-    }
-  },
   "routes": [
     {
       "src": "/api/(.*)",
