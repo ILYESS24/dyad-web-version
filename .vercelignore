@@ -15,7 +15,8 @@ src/preload.ts
 
 # Ignore Node.js worker files
 workers/
-shared/
+# Note: Keep src/shared/ for templates import
+# shared/
 
 # Ignore test files
 e2e-tests/
