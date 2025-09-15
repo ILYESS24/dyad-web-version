@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { DeepLinkProvider } from "@/contexts/DeepLinkContext";
 import { Toaster } from "sonner";
-import { TitleBar } from "@/app/TitleBar";
+import { TitleBar } from "@/app/TitleBar.tsx";
 import { useEffect } from "react";
 import { useRunApp } from "@/hooks/useRunApp";
 import { useAtomValue } from "jotai";
