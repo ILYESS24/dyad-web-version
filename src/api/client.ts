@@ -234,6 +234,16 @@ class WebApiClient {
       body: JSON.stringify({ content }),
     });
   }
+
+  // Deep link handling (mock for web environment)
+  onDeepLinkReceived(callback: (data: any) => void): () => void {
+    // In a web environment, deep links are typically handled via URL parameters
+    // For now, return a no-op unsubscribe function
+    console.log('Deep link handling not implemented for web environment');
+    return () => {
+      console.log('Deep link unsubscribe (no-op in web environment)');
+    };
+  }
 }
 
 export default WebApiClient;
