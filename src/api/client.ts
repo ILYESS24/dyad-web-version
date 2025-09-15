@@ -244,6 +244,43 @@ class WebApiClient {
       console.log('Deep link unsubscribe (no-op in web environment)');
     };
   }
+
+  // Language Model Providers (mock for web environment)
+  async getLanguageModelProviders(): Promise<any[]> {
+    // Return mock language model providers for web environment
+    const providers = [
+      {
+        id: 'openai',
+        name: 'OpenAI',
+        hasFreeTier: false,
+        websiteUrl: 'https://openai.com',
+        gatewayPrefix: 'openai',
+        type: 'cloud' as const,
+        envVarName: 'OPENAI_API_KEY',
+      },
+      {
+        id: 'anthropic',
+        name: 'Anthropic',
+        hasFreeTier: false,
+        websiteUrl: 'https://anthropic.com',
+        gatewayPrefix: 'anthropic',
+        type: 'cloud' as const,
+        envVarName: 'ANTHROPIC_API_KEY',
+      },
+      {
+        id: 'google',
+        name: 'Google',
+        hasFreeTier: false,
+        websiteUrl: 'https://ai.google.dev',
+        gatewayPrefix: 'google',
+        type: 'cloud' as const,
+        envVarName: 'GOOGLE_API_KEY',
+      },
+    ];
+
+    console.log('Returning mock language model providers for web environment');
+    return providers;
+  }
 }
 
 export default WebApiClient;
