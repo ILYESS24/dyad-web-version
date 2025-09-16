@@ -1,0 +1,5 @@
+[33mb25abe7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m CORRECTION MESSAGES SETUP - Adapter SetupBanner pour environnement web
+[33ma8a94b7[m CONFIGURATION COMPLÈTE - Node.js + API Keys préconfigurées
+[33m85c9d92[m CORRECTION SETUP BANNER WEB - Adapter l'interface pour l'environnement web
+[33mdc13282[m[33m ([m[1;31morigin/main[m[33m)[m CORRECTION IA PROVIDERS - Ajouter getLanguageModelProviders au WebApiClient
+[33mdb87be5[m  TRIGGER REDÉPLOIEMENT VERCEL - Forcer le déploiement de la correction onDeepLinkReceived
