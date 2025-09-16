@@ -652,6 +652,43 @@ class WebApiClient {
     // In a real implementation, this would remove the prompt from localStorage or backend
     console.log(`Prompt ${id} deleted`);
   }
+
+  // External URL handling (web environment)
+  async openExternalUrl(url: string): Promise<void> {
+    console.log(`Opening external URL in web environment: ${url}`);
+    
+    // In a web environment, open the URL in a new tab
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('Failed to open external URL:', error);
+      // Fallback: try to navigate to the URL directly
+      window.location.href = url;
+    }
+  }
+
+  // Reset functionality (web environment)
+  async resetAll(): Promise<void> {
+    console.log('Resetting all data in web environment');
+    
+    // In a web environment, clear localStorage and reload the page
+    try {
+      // Clear all localStorage data
+      localStorage.clear();
+      
+      // Show success message
+      console.log('All data cleared successfully');
+      
+      // Reload the page to reset the application state
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Failed to reset data:', error);
+      throw new Error('Failed to reset application data');
+    }
+  }
 }
 
 export default WebApiClient;
