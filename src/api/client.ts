@@ -231,54 +231,34 @@ class WebApiClient {
     console.log('Window controls not available in web version');
   }
 
-  // Settings management (mock for web environment)
+  // Settings management (using localStorage for web environment)
   async getUserSettings() {
-    // Return mock settings for web environment with API keys from environment
-    const mockSettings = {
-      providerSettings: {
-        openai: {
-          apiKey: {
-            value: import.meta.env.VITE_OPENAI_API_KEY || "sk-proj-YOUR_OPENAI_API_KEY_HERE"
-          }
-        },
-        anthropic: {
-          apiKey: {
-            value: import.meta.env.VITE_ANTHROPIC_API_KEY || "sk-ant-YOUR_ANTHROPIC_API_KEY_HERE"
-          }
-        },
-        google: {
-          apiKey: {
-            value: import.meta.env.VITE_GOOGLE_API_KEY || "YOUR_GOOGLE_API_KEY_HERE"
-          }
-        }
-      },
-      defaultProvider: "openai",
-      defaultModel: "gpt-4o",
-      autoApprove: true,
-      telemetryEnabled: false,
-      autoUpdateEnabled: false,
-    };
+    // Import localStorage utils dynamically to avoid circular imports
+    const { localStorageUtils } = await import('../utils/localStorage');
+    
+    console.log('Loading user settings from localStorage for web environment');
+    return localStorageUtils.getUserSettings();
+  }
 
-    console.log('Returning mock settings for web environment');
-    return mockSettings;
+  async setUserSettings(settings: any) {
+    // Import localStorage utils dynamically to avoid circular imports
+    const { localStorageUtils } = await import('../utils/localStorage');
+    
+    console.log('Saving user settings to localStorage for web environment:', settings);
+    localStorageUtils.setUserSettings(settings);
+    return settings; // Return the settings as if they were saved
   }
 
   async updateUserSettings(settings: any) {
-    console.log('Settings update requested in web environment:', settings);
-    // In a real web environment, this would save to localStorage or a backend
-    return { success: true };
+    return this.setUserSettings(settings);
   }
 
   async getEnvVars() {
-    // Return mock environment variables for web environment with API keys from environment
-    const mockEnvVars = {
-      OPENAI_API_KEY: import.meta.env.VITE_OPENAI_API_KEY || "sk-proj-YOUR_OPENAI_API_KEY_HERE",
-      ANTHROPIC_API_KEY: import.meta.env.VITE_ANTHROPIC_API_KEY || "sk-ant-YOUR_ANTHROPIC_API_KEY_HERE",
-      GOOGLE_API_KEY: import.meta.env.VITE_GOOGLE_API_KEY || "YOUR_GOOGLE_API_KEY_HERE",
-    };
-
-    console.log('Returning mock environment variables for web environment');
-    return mockEnvVars;
+    // Import localStorage utils dynamically to avoid circular imports
+    const { localStorageUtils } = await import('../utils/localStorage');
+    
+    console.log('Loading environment variables from localStorage for web environment');
+    return localStorageUtils.getEnvVars();
   }
 
   async updateEnvVars(envVars: any) {
@@ -413,6 +393,22 @@ class WebApiClient {
       console.error('Error adding dependency:', error);
       throw error;
     }
+  }
+
+  // Update provider API key (web environment)
+  async updateProviderApiKey(provider: string, apiKey: string): Promise<void> {
+    const { localStorageUtils } = await import('../utils/localStorage');
+    
+    console.log(`Updating ${provider} API key in localStorage for web environment`);
+    localStorageUtils.updateProviderApiKey(provider, apiKey);
+  }
+
+  // Delete provider API key (web environment)
+  async deleteProviderApiKey(provider: string): Promise<void> {
+    const { localStorageUtils } = await import('../utils/localStorage');
+    
+    console.log(`Deleting ${provider} API key from localStorage for web environment`);
+    localStorageUtils.deleteProviderApiKey(provider);
   }
 }
 
