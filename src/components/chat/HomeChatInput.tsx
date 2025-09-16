@@ -12,6 +12,7 @@ import { usePostHog } from "posthog-js/react";
 import { HomeSubmitOptions } from "@/pages/home";
 import { ChatInputControls } from "../ChatInputControls";
 import { LexicalChatInput } from "./LexicalChatInput";
+import { isWeb } from "@/utils/environment";
 export function HomeChatInput({
   onSubmit,
 }: {
@@ -51,8 +52,8 @@ export function HomeChatInput({
     posthog.capture("chat:home_submit");
   };
 
-  if (!settings) {
-    return null; // Or loading state
+  if (!settings && !isWeb()) {
+    return null; // Or loading state (only block in non-web environments)
   }
 
   return (

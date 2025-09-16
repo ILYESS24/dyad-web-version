@@ -3,6 +3,7 @@ import { IpcClient } from "@/ipc/ipc_client";
 import type { LanguageModelProvider } from "@/ipc/ipc_types";
 import { useSettings } from "./useSettings";
 import { cloudProviders } from "@/lib/schemas";
+import { isWeb } from "@/utils/environment";
 
 export function useLanguageModelProviders() {
   const ipcClient = IpcClient.getInstance();
@@ -31,6 +32,10 @@ export function useLanguageModelProviders() {
   };
 
   const isAnyProviderSetup = () => {
+    // In web environment, always consider providers as setup to avoid blocking UI
+    if (isWeb()) {
+      return true;
+    }
     return cloudProviders.some((provider) => isProviderSetup(provider));
   };
 

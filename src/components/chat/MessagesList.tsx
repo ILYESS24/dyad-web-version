@@ -3,6 +3,7 @@ import type { Message } from "@/ipc/ipc_types";
 import { forwardRef, useState } from "react";
 import ChatMessage from "./ChatMessage";
 import { SetupBanner } from "../SetupBanner";
+import { isWeb } from "@/utils/environment";
 
 import { useStreamChat } from "@/hooks/useStreamChat";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
@@ -56,7 +57,7 @@ export const MessagesList = forwardRef<HTMLDivElement, MessagesListProps>(
             <div className="flex flex-1 items-center justify-center text-gray-500">
               No messages yet
             </div>
-            {!isAnyProviderSetup() && <SetupBanner />}
+            {!isAnyProviderSetup() && !isWeb() && <SetupBanner />}
           </div>
         )}
         {!isStreaming && (
