@@ -43,6 +43,11 @@ export function SetupBanner() {
   const [nodeCheckError, setNodeCheckError] = useState<boolean>(false);
   const [nodeInstallStep, setNodeInstallStep] =
     useState<NodeInstallStep>("install");
+
+  // Don't show SetupBanner at all in web environment
+  if (isWeb()) {
+    return null;
+  }
   const checkNode = useCallback(async () => {
     try {
       setNodeCheckError(false);
@@ -59,6 +64,15 @@ export function SetupBanner() {
     // Only check Node.js in non-web environments
     if (!isWeb()) {
       checkNode();
+    } else {
+      // In web environment, set mock status to indicate it's ready
+      setNodeSystemInfo({
+        nodeVersion: "Web Environment",
+        pnpmVersion: null,
+        platform: "web",
+        nodeDownloadUrl: "https://nodejs.org/en/download",
+      });
+      setNodeCheckError(false);
     }
   }, [checkNode]);
 
