@@ -410,6 +410,148 @@ class WebApiClient {
     console.log(`Deleting ${provider} API key from localStorage for web environment`);
     localStorageUtils.deleteProviderApiKey(provider);
   }
+
+  // Language Models (web environment)
+  async getLanguageModels({ providerId }: { providerId: string }): Promise<any[]> {
+    console.log(`Loading language models for provider: ${providerId} in web environment`);
+    
+    // Return mock language models for web environment
+    const mockModels: { [key: string]: any[] } = {
+      openai: [
+        {
+          id: 'gpt-4o',
+          name: 'GPT-4o',
+          providerId: 'openai',
+          description: 'Most capable GPT-4 model with vision capabilities',
+          maxTokens: 128000,
+          inputCost: 0.005,
+          outputCost: 0.015,
+          contextWindow: 128000,
+        },
+        {
+          id: 'gpt-4o-mini',
+          name: 'GPT-4o Mini',
+          providerId: 'openai',
+          description: 'Fast and affordable GPT-4 model',
+          maxTokens: 128000,
+          inputCost: 0.00015,
+          outputCost: 0.0006,
+          contextWindow: 128000,
+        },
+        {
+          id: 'gpt-4-turbo',
+          name: 'GPT-4 Turbo',
+          providerId: 'openai',
+          description: 'GPT-4 with improved performance',
+          maxTokens: 128000,
+          inputCost: 0.01,
+          outputCost: 0.03,
+          contextWindow: 128000,
+        },
+        {
+          id: 'gpt-3.5-turbo',
+          name: 'GPT-3.5 Turbo',
+          providerId: 'openai',
+          description: 'Fast and efficient GPT-3.5 model',
+          maxTokens: 16385,
+          inputCost: 0.0005,
+          outputCost: 0.0015,
+          contextWindow: 16385,
+        },
+      ],
+      anthropic: [
+        {
+          id: 'claude-3-5-sonnet-20241022',
+          name: 'Claude 3.5 Sonnet',
+          providerId: 'anthropic',
+          description: 'Most intelligent Claude model with enhanced capabilities',
+          maxTokens: 200000,
+          inputCost: 0.003,
+          outputCost: 0.015,
+          contextWindow: 200000,
+        },
+        {
+          id: 'claude-3-5-haiku-20241022',
+          name: 'Claude 3.5 Haiku',
+          providerId: 'anthropic',
+          description: 'Fast and efficient Claude model',
+          maxTokens: 200000,
+          inputCost: 0.0008,
+          outputCost: 0.004,
+          contextWindow: 200000,
+        },
+        {
+          id: 'claude-3-opus-20240229',
+          name: 'Claude 3 Opus',
+          providerId: 'anthropic',
+          description: 'Most powerful Claude 3 model',
+          maxTokens: 200000,
+          inputCost: 0.015,
+          outputCost: 0.075,
+          contextWindow: 200000,
+        },
+      ],
+      google: [
+        {
+          id: 'gemini-1.5-pro',
+          name: 'Gemini 1.5 Pro',
+          providerId: 'google',
+          description: 'Most capable Gemini model with large context',
+          maxTokens: 2097152,
+          inputCost: 0.00125,
+          outputCost: 0.005,
+          contextWindow: 2097152,
+        },
+        {
+          id: 'gemini-1.5-flash',
+          name: 'Gemini 1.5 Flash',
+          providerId: 'google',
+          description: 'Fast and efficient Gemini model',
+          maxTokens: 1048576,
+          inputCost: 0.000075,
+          outputCost: 0.0003,
+          contextWindow: 1048576,
+        },
+        {
+          id: 'gemini-pro',
+          name: 'Gemini Pro',
+          providerId: 'google',
+          description: 'Standard Gemini Pro model',
+          maxTokens: 32768,
+          inputCost: 0.0005,
+          outputCost: 0.0015,
+          contextWindow: 32768,
+        },
+      ],
+    };
+
+    return mockModels[providerId] || [];
+  }
+
+  async getLanguageModelsByProviders(): Promise<Record<string, any[]>> {
+    console.log('Loading language models by providers in web environment');
+    
+    const modelsByProviders: Record<string, any[]> = {};
+    
+    // Get models for each provider
+    const providers = ['openai', 'anthropic', 'google'];
+    for (const provider of providers) {
+      modelsByProviders[provider] = await this.getLanguageModels({ providerId: provider });
+    }
+
+    return modelsByProviders;
+  }
+
+  // Local Models (mock for web environment)
+  async listLocalOllamaModels(): Promise<any[]> {
+    console.log('Listing local Ollama models (mock for web environment)');
+    return []; // No local models in web environment
+  }
+
+  async listLocalLMStudioModels(): Promise<any[]> {
+    console.log('Listing local LM Studio models (mock for web environment)');
+    return []; // No local models in web environment
+  }
 }
 
 export default WebApiClient;
