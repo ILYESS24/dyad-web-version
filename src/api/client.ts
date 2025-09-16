@@ -552,6 +552,106 @@ class WebApiClient {
     console.log('Listing local LM Studio models (mock for web environment)');
     return []; // No local models in web environment
   }
+
+  // Prompts management (web environment)
+  async listPrompts(): Promise<any[]> {
+    console.log('Listing prompts in web environment');
+    
+    // Return mock prompts for web environment
+    const mockPrompts = [
+      {
+        id: 1,
+        title: "Code Review Assistant",
+        description: "Help review and improve code quality",
+        content: "Please review the following code and provide suggestions for improvement:\n\n```\n{code}\n```\n\nFocus on:\n- Code quality and best practices\n- Performance optimizations\n- Security considerations\n- Readability improvements",
+        createdAt: new Date('2024-01-15T10:00:00Z'),
+        updatedAt: new Date('2024-01-15T10:00:00Z'),
+      },
+      {
+        id: 2,
+        title: "Bug Fix Helper",
+        description: "Assist in debugging and fixing code issues",
+        content: "I'm encountering an issue with my code. Here's the problem:\n\n{problem_description}\n\nError message: {error_message}\n\nCode snippet:\n```\n{code_snippet}\n```\n\nPlease help me:\n1. Identify the root cause\n2. Provide a solution\n3. Explain why this fix works",
+        createdAt: new Date('2024-01-16T14:30:00Z'),
+        updatedAt: new Date('2024-01-16T14:30:00Z'),
+      },
+      {
+        id: 3,
+        title: "Feature Implementation",
+        description: "Guide for implementing new features",
+        content: "I want to implement a new feature: {feature_description}\n\nCurrent codebase context:\n- Framework: {framework}\n- Language: {language}\n- Architecture: {architecture}\n\nPlease help me:\n1. Plan the implementation approach\n2. Identify required components\n3. Provide code examples\n4. Suggest testing strategies",
+        createdAt: new Date('2024-01-17T09:15:00Z'),
+        updatedAt: new Date('2024-01-17T09:15:00Z'),
+      },
+      {
+        id: 4,
+        title: "Documentation Generator",
+        description: "Generate comprehensive documentation",
+        content: "Please generate documentation for the following code:\n\n```\n{code}\n```\n\nInclude:\n- Function/class descriptions\n- Parameter explanations\n- Usage examples\n- Return value details\n- Error handling information\n\nFormat the documentation in a clear, professional style.",
+        createdAt: new Date('2024-01-18T16:45:00Z'),
+        updatedAt: new Date('2024-01-18T16:45:00Z'),
+      },
+      {
+        id: 5,
+        title: "API Integration Helper",
+        description: "Assist with API integrations and web services",
+        content: "I need help integrating with this API: {api_name}\n\nAPI Documentation: {api_docs_url}\n\nMy requirements:\n- {requirement_1}\n- {requirement_2}\n- {requirement_3}\n\nPlease help me:\n1. Understand the API structure\n2. Implement authentication\n3. Create API calls\n4. Handle responses and errors\n5. Add proper error handling",
+        createdAt: new Date('2024-01-19T11:20:00Z'),
+        updatedAt: new Date('2024-01-19T11:20:00Z'),
+      },
+    ];
+
+    return mockPrompts;
+  }
+
+  async createPrompt(params: {
+    title: string;
+    description?: string;
+    content: string;
+  }): Promise<any> {
+    console.log('Creating prompt in web environment:', params);
+    
+    // Create a new prompt with mock ID
+    const newPrompt = {
+      id: Date.now(), // Simple ID generation
+      title: params.title,
+      description: params.description || '',
+      content: params.content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // In a real implementation, this would be saved to localStorage or a backend
+    console.log('Prompt created:', newPrompt);
+    return newPrompt;
+  }
+
+  async updatePrompt(params: {
+    id: number;
+    title: string;
+    description?: string;
+    content: string;
+  }): Promise<void> {
+    console.log('Updating prompt in web environment:', params);
+    
+    // In a real implementation, this would update the prompt in localStorage or backend
+    const updatedPrompt = {
+      id: params.id,
+      title: params.title,
+      description: params.description || '',
+      content: params.content,
+      updatedAt: new Date(),
+    };
+
+    console.log('Prompt updated:', updatedPrompt);
+  }
+
+  async deletePrompt(id: number): Promise<void> {
+    console.log(`Deleting prompt ${id} in web environment`);
+    
+    // In a real implementation, this would remove the prompt from localStorage or backend
+    console.log(`Prompt ${id} deleted`);
+  }
 }
 
 export default WebApiClient;
