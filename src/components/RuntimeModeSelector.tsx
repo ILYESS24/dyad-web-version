@@ -9,9 +9,15 @@ import {
 import { useSettings } from "@/hooks/useSettings";
 import { showError } from "@/lib/toast";
 import { IpcClient } from "@/ipc/ipc_client";
+import { isWeb } from "@/utils/environment";
 
 export function RuntimeModeSelector() {
   const { settings, updateSettings } = useSettings();
+
+  // Don't show RuntimeModeSelector at all in web environment
+  if (isWeb()) {
+    return null;
+  }
 
   if (!settings) {
     return null;

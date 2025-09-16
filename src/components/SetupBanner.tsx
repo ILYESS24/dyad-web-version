@@ -33,11 +33,6 @@ type NodeInstallStep =
   | "finished-checking";
 
 export function SetupBanner() {
-  // Don't show SetupBanner at all in web environment - CHECK FIRST!
-  if (isWeb()) {
-    return null;
-  }
-
   const posthog = usePostHog();
   const navigate = useNavigate();
   const { isAnyProviderSetup, isLoading: loading } =
@@ -48,6 +43,11 @@ export function SetupBanner() {
   const [nodeCheckError, setNodeCheckError] = useState<boolean>(false);
   const [nodeInstallStep, setNodeInstallStep] =
     useState<NodeInstallStep>("install");
+
+  // Don't show SetupBanner at all in web environment
+  if (isWeb()) {
+    return null;
+  }
   const checkNode = useCallback(async () => {
     try {
       setNodeCheckError(false);

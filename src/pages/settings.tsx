@@ -24,6 +24,7 @@ import { AutoUpdateSwitch } from "@/components/AutoUpdateSwitch";
 import { ReleaseChannelSelector } from "@/components/ReleaseChannelSelector";
 import { NeonIntegration } from "@/components/NeonIntegration";
 import { RuntimeModeSelector } from "@/components/RuntimeModeSelector";
+import { isWeb } from "@/utils/environment";
 
 export default function SettingsPage() {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
@@ -128,34 +129,36 @@ export default function SettingsPage() {
               Experiments
             </h2>
             <div className="space-y-4">
-              <div className="space-y-1 mt-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="enable-native-git"
-                    checked={!!settings?.enableNativeGit}
-                    onCheckedChange={(checked) => {
-                      updateSettings({
-                        enableNativeGit: checked,
-                      });
-                    }}
-                  />
-                  <Label htmlFor="enable-native-git">Enable Native Git</Label>
+              {!isWeb() && (
+                <div className="space-y-1 mt-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="enable-native-git"
+                      checked={!!settings?.enableNativeGit}
+                      onCheckedChange={(checked) => {
+                        updateSettings({
+                          enableNativeGit: checked,
+                        });
+                      }}
+                    />
+                    <Label htmlFor="enable-native-git">Enable Native Git</Label>
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Native Git offers faster performance but requires{" "}
+                    <a
+                      onClick={() => {
+                        IpcClient.getInstance().openExternalUrl(
+                          "https://git-scm.com/downloads",
+                        );
+                      }}
+                      className="text-blue-600 hover:underline dark:text-blue-400"
+                    >
+                      installing Git
+                    </a>
+                    .
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Native Git offers faster performance but requires{" "}
-                  <a
-                    onClick={() => {
-                      IpcClient.getInstance().openExternalUrl(
-                        "https://git-scm.com/downloads",
-                      );
-                    }}
-                    className="text-blue-600 hover:underline dark:text-blue-400"
-                  >
-                    installing Git
-                  </a>
-                  .
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
