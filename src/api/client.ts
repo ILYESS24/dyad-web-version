@@ -68,16 +68,46 @@ class WebApiClient {
     });
   }
 
-  async runApp(appId: number) {
-    return this.request<{ success: boolean; url: string; message: string }>(`/apps/${appId}/run`, {
-      method: 'POST',
-    });
+  async runApp(appId: number, onOutput?: (output: any) => void): Promise<void> {
+    try {
+      // Get app files from the database
+      const app = await this.request<any>(`/apps/${appId}`);
+      
+      // Create sandbox project
+      const sandboxResult = await this.request<any>('/api/sandbox/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          appName: app.name,
+          files: app.files || {},
+          template: 'react' // Default template
+        })
+      });
+
+      if (sandboxResult.success && onOutput) {
+        onOutput({
+          message: `App running at: ${sandboxResult.url}`,
+          type: 'stdout',
+          appId,
+          timestamp: Date.now()
+        });
+      }
+
+    } catch (error) {
+      console.error('Error running app:', error);
+      if (onOutput) {
+        onOutput({
+          message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          type: 'stderr',
+          appId,
+          timestamp: Date.now()
+        });
+      }
+    }
   }
 
-  async stopApp(appId: number) {
-    return this.request<{ success: boolean; message: string }>(`/apps/${appId}/stop`, {
-      method: 'POST',
-    });
+  async stopApp(appId: number): Promise<void> {
+    console.log(`Stopping app ${appId} in web environment`);
+    // In web environment, apps run in sandboxes, so we don't need to stop them
   }
 
   // Chat management
@@ -136,11 +166,25 @@ class WebApiClient {
     });
   }
 
-  // Build management
-  async buildApp(appId: number) {
-    return this.request<{ success: boolean; message: string }>(`/build/${appId}`, {
-      method: 'POST',
-    });
+  // Build management (web environment using cloud build service)
+  async buildApp(appId: number): Promise<any> {
+    try {
+      const app = await this.request<any>(`/apps/${appId}`);
+      
+      const buildResult = await this.request<any>('/api/build', {
+        method: 'POST',
+        body: JSON.stringify({
+          appId,
+          files: app.files || {},
+          buildScript: 'build'
+        })
+      });
+
+      return buildResult;
+    } catch (error) {
+      console.error('Error building app:', error);
+      throw error;
+    }
   }
 
   async getBuildStatus(appId: number) {
@@ -351,6 +395,24 @@ class WebApiClient {
 
     console.log('Returning mock Node.js status for web environment');
     return mockStatus;
+  }
+
+  // Add dependency (web environment)
+  async addDependency(appId: number, packageName: string): Promise<any> {
+    try {
+      const result = await this.request<any>('/api/dependencies/add', {
+        method: 'POST',
+        body: JSON.stringify({
+          appId,
+          packageName
+        })
+      });
+
+      return result;
+    } catch (error) {
+      console.error('Error adding dependency:', error);
+      throw error;
+    }
   }
 }
 

@@ -6,6 +6,7 @@ import { versionRoutes } from './versions.js';
 import { buildRoutes } from './build.js';
 import { fileRoutes } from './files.js';
 import { releaseNotesRoutes } from './release-notes.js';
+import cloudRouter from './cloud.js';
 
 export function setupRoutes(app: Express) {
   // API routes
@@ -16,6 +17,7 @@ export function setupRoutes(app: Express) {
   app.use('/api/build', buildRoutes);
   app.use('/api/files', fileRoutes);
   app.use('/api/release-notes', releaseNotesRoutes);
+  app.use('/api', cloudRouter); // Cloud services routes
 
   // Health check
   app.get('/api/health', (req, res) => {

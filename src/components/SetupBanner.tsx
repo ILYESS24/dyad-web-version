@@ -56,7 +56,10 @@ export function SetupBanner() {
   }, [setNodeSystemInfo, setNodeCheckError]);
 
   useEffect(() => {
-    checkNode();
+    // Only check Node.js in non-web environments
+    if (!isWeb()) {
+      checkNode();
+    }
   }, [checkNode]);
 
   const handleAiSetupClick = () => {
@@ -103,7 +106,7 @@ export function SetupBanner() {
   });
 
   const itemsNeedAction: string[] = [];
-  // NEVER show node-setup in web environment
+  // NEVER show node-setup in web environment - completely skip Node.js checks
   if (!isWebEnvironment && !isNodeSetupComplete && nodeSystemInfo) {
     itemsNeedAction.push("node-setup");
   }
