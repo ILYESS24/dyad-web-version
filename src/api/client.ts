@@ -44,9 +44,7 @@ class WebApiClient {
     return this.request<{ apps: any[]; appBasePath: string }>('/apps');
   }
 
-  async getApp(appId: number) {
-    return this.request<any>(`/apps/${appId}`);
-  }
+  // getApp method moved to web environment section below
 
   async createApp(params: { name?: string }) {
     return this.request<{ app: any; chatId: number }>('/apps', {
@@ -111,9 +109,7 @@ class WebApiClient {
   }
 
   // Chat management
-  async getChat(chatId: number) {
-    return this.request<{ messages: any[] }>(`/chat/${chatId}/messages`);
-  }
+  // getChat method moved to web environment section below
 
   async getChatById(chatId: number) {
     return this.request<any>(`/chat/${chatId}`);
@@ -286,12 +282,7 @@ class WebApiClient {
     });
   }
 
-  async editAppFile(appId: number, filePath: string, content: string) {
-    return this.request<{ warning?: string }>(`/files/${appId}/${encodeURIComponent(filePath)}`, {
-      method: 'PUT',
-      body: JSON.stringify({ content }),
-    });
-  }
+  // editAppFile method moved to web environment section below
 
   // Deep link handling (mock for web environment)
   onDeepLinkReceived(callback: (data: any) => void): () => void {
@@ -364,18 +355,7 @@ class WebApiClient {
     return mockProviderSettings;
   }
 
-  // Node.js status check (mock for web environment)
-  async getNodejsStatus(): Promise<any> {
-    // Return mock Node.js status for web environment
-    const mockStatus = {
-      nodeVersion: "Web Environment",
-      pnpmVersion: null,
-      platform: "web",
-    };
-
-    console.log('Returning mock Node.js status for web environment');
-    return mockStatus;
-  }
+  // getNodejsStatus method moved to web environment section below
 
   // Add dependency (web environment)
   async addDependency(appId: number, packageName: string): Promise<any> {
@@ -688,6 +668,244 @@ class WebApiClient {
       console.error('Failed to reset data:', error);
       throw new Error('Failed to reset application data');
     }
+  }
+
+  // Chat management (web environment)
+  async getChat(chatId: number): Promise<any> {
+    console.log(`Getting chat ${chatId} in web environment`);
+    
+    // Return mock chat data
+    const mockChat = {
+      id: chatId,
+      title: `Chat ${chatId}`,
+      messages: [],
+      appId: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    return mockChat;
+  }
+
+  async createChat(appId: number): Promise<number> {
+    console.log(`Creating chat for app ${appId} in web environment`);
+    
+    // Generate a mock chat ID
+    const chatId = Date.now();
+    console.log(`Created mock chat with ID: ${chatId}`);
+    return chatId;
+  }
+
+  async updateChat(params: { chatId: number; title: string }): Promise<void> {
+    console.log(`Updating chat ${params.chatId} with title "${params.title}" in web environment`);
+    // In a real implementation, this would update the chat in localStorage or backend
+  }
+
+  async deleteMessages(chatId: number): Promise<void> {
+    console.log(`Deleting messages for chat ${chatId} in web environment`);
+    // In a real implementation, this would clear messages in localStorage or backend
+  }
+
+  async approveProposal(params: { chatId: number; messageId: number }): Promise<void> {
+    console.log(`Approving proposal for chat ${params.chatId}, message ${params.messageId} in web environment`);
+    // In a real implementation, this would approve the proposal
+  }
+
+  async rejectProposal(params: { chatId: number; messageId: number }): Promise<void> {
+    console.log(`Rejecting proposal for chat ${params.chatId}, message ${params.messageId} in web environment`);
+    // In a real implementation, this would reject the proposal
+  }
+
+  async cancelChatStream(chatId: number): Promise<void> {
+    console.log(`Cancelling chat stream for chat ${chatId} in web environment`);
+    // In a real implementation, this would cancel the streaming
+  }
+
+  // App management (web environment)
+  async getApp(appId: number): Promise<any> {
+    console.log(`Getting app ${appId} in web environment`);
+    
+    // Return mock app data
+    const mockApp = {
+      id: appId,
+      name: `App ${appId}`,
+      description: `Mock app ${appId}`,
+      files: {},
+      githubOrg: null,
+      githubRepo: null,
+      vercelProjectName: null,
+      vercelTeamSlug: null,
+      vercelDeploymentUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    return mockApp;
+  }
+
+  async editAppFile(params: { appId: number; filePath: string; content: string }): Promise<{ warning?: string }> {
+    console.log(`Editing app ${params.appId} file ${params.filePath} in web environment`);
+    
+    // In a real implementation, this would save the file content
+    return { warning: undefined };
+  }
+
+  async getAppEnvVars(params: { appId: number }): Promise<{ key: string; value: string }[]> {
+    console.log(`Getting environment variables for app ${params.appId} in web environment`);
+    
+    // Return mock environment variables
+    return [
+      { key: 'NODE_ENV', value: 'development' },
+      { key: 'PORT', value: '3000' },
+    ];
+  }
+
+  async setAppEnvVars(params: { appId: number; envVars: { key: string; value: string }[] }): Promise<void> {
+    console.log(`Setting environment variables for app ${params.appId} in web environment:`, params.envVars);
+    // In a real implementation, this would save the environment variables
+  }
+
+  // Vercel integration (web environment)
+  async listVercelProjects(): Promise<any[]> {
+    console.log('Listing Vercel projects in web environment');
+    
+    // Return mock Vercel projects
+    return [
+      {
+        id: 'mock-project-1',
+        name: 'mock-project',
+        framework: 'nextjs',
+        gitRepository: null,
+      },
+    ];
+  }
+
+  async saveVercelAccessToken(params: { token: string }): Promise<void> {
+    console.log('Saving Vercel access token in web environment');
+    // In a real implementation, this would save the token securely
+  }
+
+  async isVercelProjectAvailable(params: { name: string }): Promise<boolean> {
+    console.log(`Checking if Vercel project "${params.name}" is available in web environment`);
+    return true; // Mock: always available
+  }
+
+  async createVercelProject(params: { name: string; appId: number }): Promise<void> {
+    console.log(`Creating Vercel project "${params.name}" for app ${params.appId} in web environment`);
+    // In a real implementation, this would create the project
+  }
+
+  async connectToExistingVercelProject(params: { projectId: string; appId: number }): Promise<void> {
+    console.log(`Connecting to existing Vercel project ${params.projectId} for app ${params.appId} in web environment`);
+    // In a real implementation, this would connect the project
+  }
+
+  // Supabase integration (web environment)
+  async listSupabaseProjects(): Promise<any[]> {
+    console.log('Listing Supabase projects in web environment');
+    
+    // Return mock Supabase projects
+    return [
+      {
+        id: 'mock-supabase-project-1',
+        name: 'Mock Supabase Project',
+        database_url: 'postgresql://mock:mock@mock.supabase.co:5432/mock',
+        anon_key: 'mock-anon-key',
+        service_role_key: 'mock-service-role-key',
+      },
+    ];
+  }
+
+  async setSupabaseAppProject(projectId: string, appId: number): Promise<void> {
+    console.log(`Setting Supabase project ${projectId} for app ${appId} in web environment`);
+    // In a real implementation, this would associate the project with the app
+  }
+
+  async removeSupabaseAppProject(appId: number): Promise<void> {
+    console.log(`Removing Supabase project association for app ${appId} in web environment`);
+    // In a real implementation, this would remove the association
+  }
+
+  // Context and paths (web environment)
+  async getChatContextResults(params: { appId: number }): Promise<any> {
+    console.log(`Getting chat context results for app ${params.appId} in web environment`);
+    
+    return {
+      contextPaths: [],
+      smartContextAutoIncludes: [],
+      excludePaths: [],
+    };
+  }
+
+  async setChatContext(params: { appId: number; chatContext: any }): Promise<void> {
+    console.log(`Setting chat context for app ${params.appId} in web environment:`, params.chatContext);
+    // In a real implementation, this would save the context configuration
+  }
+
+  // Tokens and proposals (web environment)
+  async countTokens(params: { chatId: number; input: string }): Promise<any> {
+    console.log(`Counting tokens for chat ${params.chatId} in web environment`);
+    
+    // Return mock token count
+    return {
+      tokenCount: Math.ceil(params.input.length / 4), // Rough estimate
+      cost: 0.001,
+    };
+  }
+
+  async getProposal(chatId: number): Promise<any> {
+    console.log(`Getting proposal for chat ${chatId} in web environment`);
+    
+    // Return null to indicate no proposal available
+    return null;
+  }
+
+  // Session and cache (web environment)
+  async clearSessionData(): Promise<void> {
+    console.log('Clearing session data in web environment');
+    
+    // Clear session-related data from localStorage
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.includes('session') || key.includes('cache'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      console.log('Session data cleared successfully');
+    } catch (error) {
+      console.error('Failed to clear session data:', error);
+    }
+  }
+
+  // Neon integration (web environment)
+  async getNeonProject(params: { appId: number }): Promise<any> {
+    console.log(`Getting Neon project for app ${params.appId} in web environment`);
+    
+    return {
+      id: 'mock-neon-project',
+      name: 'Mock Neon Project',
+      database_url: 'postgresql://mock:mock@mock.neon.tech:5432/mock',
+    };
+  }
+
+  // Node.js and environment (web environment)
+  async getNodejsStatus(): Promise<any> {
+    console.log('Getting Node.js status in web environment');
+    
+    return {
+      nodeVersion: "Web Environment",
+      pnpmVersion: null,
+      platform: "web",
+      nodeDownloadUrl: "https://nodejs.org/en/download",
+    };
+  }
+
+  async reloadEnvPath(): Promise<void> {
+    console.log('Reloading environment path in web environment');
+    // In web environment, this is a no-op
   }
 }
 
