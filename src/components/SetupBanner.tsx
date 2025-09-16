@@ -33,6 +33,11 @@ type NodeInstallStep =
   | "finished-checking";
 
 export function SetupBanner() {
+  // Don't show SetupBanner at all in web environment - CHECK FIRST!
+  if (isWeb()) {
+    return null;
+  }
+
   const posthog = usePostHog();
   const navigate = useNavigate();
   const { isAnyProviderSetup, isLoading: loading } =
@@ -43,11 +48,6 @@ export function SetupBanner() {
   const [nodeCheckError, setNodeCheckError] = useState<boolean>(false);
   const [nodeInstallStep, setNodeInstallStep] =
     useState<NodeInstallStep>("install");
-
-  // Don't show SetupBanner at all in web environment
-  if (isWeb()) {
-    return null;
-  }
   const checkNode = useCallback(async () => {
     try {
       setNodeCheckError(false);
@@ -183,13 +183,22 @@ export function SetupBanner() {
                     getStatusIcon(isNodeSetupComplete, nodeCheckError)
                   )}
                   <span className="font-medium text-sm">
-                    1. Install Node.js (App Runtime)
+                    {isWeb() ? "1. Web Environment Ready" : "1. Install Node.js (App Runtime)"}
                   </span>
                 </div>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 pt-2 pb-4 bg-white dark:bg-zinc-900 border-t border-inherit">
-              {isWeb() ? null : (
+              {isWeb() ? (
+                <div className="text-sm">
+                  <p className="text-green-600 dark:text-green-400">
+                    ✅ Running in web environment. No Node.js installation required.
+                  </p>
+                  <p className="mt-2 text-gray-600 dark:text-gray-400">
+                    Your applications will run directly in the browser with web-compatible features.
+                  </p>
+                </div>
+              ) : (
                 <>
                   {nodeCheckError && (
                     <p className="text-sm text-red-600 dark:text-red-400">

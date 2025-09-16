@@ -95,8 +95,8 @@ Issues that do not meet these requirements will be closed and may need to be res
 - Dyad Version: ${debugInfo.dyadVersion}
 - Platform: ${debugInfo.platform}
 - Architecture: ${debugInfo.architecture}
-- Node Version: ${debugInfo.nodeVersion || "Web Environment"}
-- PNPM Version: ${debugInfo.pnpmVersion || "Web Environment"}
+- Node Version: ${debugInfo.nodeVersion || "n/a"}
+- PNPM Version: ${debugInfo.pnpmVersion || "n/a"}
 - Node Path: ${debugInfo.nodePath || "n/a"}
 - Telemetry ID: ${debugInfo.telemetryId || "n/a"}
 - Model: ${debugInfo.selectedLanguageModel || "n/a"}
@@ -337,7 +337,7 @@ Session ID: ${sessionId}
                 <p>Architecture: {chatLogsData.debugInfo.architecture}</p>
                 <p>
                   Node Version:{" "}
-                  {chatLogsData.debugInfo.nodeVersion || "Web Environment"}
+                  {chatLogsData.debugInfo.nodeVersion || "Not available"}
                 </p>
               </div>
             </div>
