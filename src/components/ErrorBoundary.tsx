@@ -43,8 +43,8 @@ ${error?.stack ? `\n\`\`\`\n${error.stack.slice(0, 1000)}\n\`\`\`` : ""}
 - Dyad Version: ${debugInfo.dyadVersion}
 - Platform: ${debugInfo.platform}
 - Architecture: ${debugInfo.architecture}
-- Node Version: ${debugInfo.nodeVersion || "Not available"}
-- PNPM Version: ${debugInfo.pnpmVersion || "Not available"}
+- Node Version: ${debugInfo.nodeVersion || "Web Environment"}
+- PNPM Version: ${debugInfo.pnpmVersion || "Web Environment"}
 - Node Path: ${debugInfo.nodePath || "Not available"}
 - Telemetry ID: ${debugInfo.telemetryId || "Not available"}
 
