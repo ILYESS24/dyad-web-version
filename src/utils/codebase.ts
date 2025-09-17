@@ -6,7 +6,17 @@ import log from "electron-log";
 import { IS_TEST_BUILD } from "../ipc/utils/test_utils";
 import { glob } from "glob";
 import { AppChatContext } from "../lib/schemas";
-import { readSettings } from "@/main/settings";
+// Import settings with web compatibility
+const readSettings = async () => {
+  const { isWeb } = await import('./environment');
+  if (isWeb()) {
+    const { webSettings } = await import('./web-settings');
+    return webSettings.readSettings();
+  } else {
+    const { readSettings: originalReadSettings } = await import('../main/settings');
+    return originalReadSettings();
+  }
+};
 import { AsyncVirtualFileSystem } from "../../shared/VirtualFilesystem";
 
 const logger = log.scope("utils/codebase");
@@ -425,7 +435,7 @@ export async function extractCodebase({
   formattedOutput: string;
   files: CodebaseFile[];
 }> {
-  const settings = readSettings();
+  const settings = await readSettings();
   const isSmartContextEnabled =
     settings?.enableDyadPro && settings?.enableProSmartFilesContextMode;
 

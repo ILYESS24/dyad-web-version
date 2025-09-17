@@ -32,7 +32,10 @@ class WebLogger implements LogFunctions {
   }
 
   debug(...args: any[]) {
-    if (process.env.NODE_ENV === 'development') {
+    // In web environment, always show debug logs
+    if (typeof window !== 'undefined') {
+      console.debug(`[${this.scope}]`, ...args);
+    } else if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
       console.debug(`[${this.scope}]`, ...args);
     }
   }
@@ -45,7 +48,10 @@ export default {
   warn: (...args: any[]) => console.warn(...args),
   error: (...args: any[]) => console.error(...args),
   debug: (...args: any[]) => {
-    if (process.env.NODE_ENV === 'development') {
+    // In web environment, always show debug logs
+    if (typeof window !== 'undefined') {
+      console.debug(...args);
+    } else if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
       console.debug(...args);
     }
   }
