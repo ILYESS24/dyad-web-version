@@ -18,8 +18,15 @@ class WebApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    // In web environment, use localStorage instead of API calls
-    if (isWeb()) {
+    // Force mock responses in web environment - check multiple conditions
+    const isWebEnvironment = isWeb() || 
+                            (typeof window !== 'undefined' && 
+                             (window.location?.hostname?.includes('vercel.app') ||
+                              window.location?.hostname?.includes('netlify.app') ||
+                              window.location?.hostname?.includes('github.io') ||
+                              window.location?.hostname?.includes('localhost')));
+
+    if (isWebEnvironment) {
       console.log('Web environment detected, using localStorage instead of API call to:', endpoint);
       return this.mockApiResponse<T>(endpoint, options);
     }
@@ -58,11 +65,23 @@ class WebApiClient {
         return this.getMockSettings() as T;
       case '/env-vars':
         return this.getMockEnvVars() as T;
+      case '/api/env-vars':
+        return this.getMockEnvVars() as T;
+      case '/api/settings':
+        return this.getMockSettings() as T;
+      case '/api/apps':
+        return this.getMockApps() as T;
       default:
         if (endpoint.startsWith('/apps/') && endpoint.endsWith('/files')) {
           return this.getMockAppFiles() as T;
         }
         if (endpoint.startsWith('/apps/') && options.method === 'GET') {
+          return this.getMockApp() as T;
+        }
+        if (endpoint.startsWith('/api/apps/') && endpoint.endsWith('/files')) {
+          return this.getMockAppFiles() as T;
+        }
+        if (endpoint.startsWith('/api/apps/') && options.method === 'GET') {
           return this.getMockApp() as T;
         }
         return {} as T;
@@ -643,122 +662,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     localStorageUtils.deleteProviderApiKey(provider);
   }
 
-  // Language Models (web environment)
-  async getLanguageModels({ providerId }: { providerId: string }): Promise<any[]> {
-    console.log(`Loading language models for provider: ${providerId} in web environment`);
-    
-    // Return mock language models for web environment
-    const mockModels: { [key: string]: any[] } = {
-      openai: [
-        {
-          id: 'gpt-4o',
-          name: 'GPT-4o',
-          providerId: 'openai',
-          description: 'Most capable GPT-4 model with vision capabilities',
-          maxTokens: 128000,
-          inputCost: 0.005,
-          outputCost: 0.015,
-          contextWindow: 128000,
-        },
-        {
-          id: 'gpt-4o-mini',
-          name: 'GPT-4o Mini',
-          providerId: 'openai',
-          description: 'Fast and affordable GPT-4 model',
-          maxTokens: 128000,
-          inputCost: 0.00015,
-          outputCost: 0.0006,
-          contextWindow: 128000,
-        },
-        {
-          id: 'gpt-4-turbo',
-          name: 'GPT-4 Turbo',
-          providerId: 'openai',
-          description: 'GPT-4 with improved performance',
-          maxTokens: 128000,
-          inputCost: 0.01,
-          outputCost: 0.03,
-          contextWindow: 128000,
-        },
-        {
-          id: 'gpt-3.5-turbo',
-          name: 'GPT-3.5 Turbo',
-          providerId: 'openai',
-          description: 'Fast and efficient GPT-3.5 model',
-          maxTokens: 16385,
-          inputCost: 0.0005,
-          outputCost: 0.0015,
-          contextWindow: 16385,
-        },
-      ],
-      anthropic: [
-        {
-          id: 'claude-3-5-sonnet-20241022',
-          name: 'Claude 3.5 Sonnet',
-          providerId: 'anthropic',
-          description: 'Most intelligent Claude model with enhanced capabilities',
-          maxTokens: 200000,
-          inputCost: 0.003,
-          outputCost: 0.015,
-          contextWindow: 200000,
-        },
-        {
-          id: 'claude-3-5-haiku-20241022',
-          name: 'Claude 3.5 Haiku',
-          providerId: 'anthropic',
-          description: 'Fast and efficient Claude model',
-          maxTokens: 200000,
-          inputCost: 0.0008,
-          outputCost: 0.004,
-          contextWindow: 200000,
-        },
-        {
-          id: 'claude-3-opus-20240229',
-          name: 'Claude 3 Opus',
-          providerId: 'anthropic',
-          description: 'Most powerful Claude 3 model',
-          maxTokens: 200000,
-          inputCost: 0.015,
-          outputCost: 0.075,
-          contextWindow: 200000,
-        },
-      ],
-      google: [
-        {
-          id: 'gemini-1.5-pro',
-          name: 'Gemini 1.5 Pro',
-          providerId: 'google',
-          description: 'Most capable Gemini model with large context',
-          maxTokens: 2097152,
-          inputCost: 0.00125,
-          outputCost: 0.005,
-          contextWindow: 2097152,
-        },
-        {
-          id: 'gemini-1.5-flash',
-          name: 'Gemini 1.5 Flash',
-          providerId: 'google',
-          description: 'Fast and efficient Gemini model',
-          maxTokens: 1048576,
-          inputCost: 0.000075,
-          outputCost: 0.0003,
-          contextWindow: 1048576,
-        },
-        {
-          id: 'gemini-pro',
-          name: 'Gemini Pro',
-          providerId: 'google',
-          description: 'Standard Gemini Pro model',
-          maxTokens: 32768,
-          inputCost: 0.0005,
-          outputCost: 0.0015,
-          contextWindow: 32768,
-        },
-      ],
-    };
-
-    return mockModels[providerId] || [];
-  }
 
   async getLanguageModelsByProviders(): Promise<Record<string, any[]>> {
     console.log('Loading language models by providers in web environment');
@@ -772,6 +675,127 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     }
 
     return modelsByProviders;
+  }
+
+  // Fixed getLanguageModels method with overloads
+  async getLanguageModels(): Promise<any[]>;
+  async getLanguageModels(params: { providerId: string }): Promise<any[]>;
+  async getLanguageModels(params?: { providerId: string }): Promise<any[]> {
+    if (!params) {
+      // Return all models from all providers
+      const allModels: any[] = [];
+      const providers = ['openai', 'anthropic', 'google'];
+      for (const provider of providers) {
+        const models = await this.getLanguageModels({ providerId: provider });
+        allModels.push(...models);
+      }
+      return allModels;
+    }
+    
+    console.log(`Loading language models for provider: ${params.providerId} in web environment`);
+    
+    // Return mock language models for web environment
+    const mockModels: { [key: string]: any[] } = {
+      openai: [
+        {
+          id: 'gpt-4o',
+          name: 'GPT-4o',
+          description: 'Most capable model with vision capabilities',
+          maxTokens: 128000,
+          costPerToken: 0.00003,
+          contextWindow: 128000,
+          supportsImages: true,
+          supportsFunctionCalling: true,
+          providerId: 'openai',
+          modelType: 'chat' as const,
+          isLocal: false,
+        },
+        {
+          id: 'gpt-4o-mini',
+          name: 'GPT-4o Mini',
+          description: 'Faster and more affordable GPT-4o',
+          maxTokens: 128000,
+          costPerToken: 0.0000015,
+          contextWindow: 128000,
+          supportsImages: true,
+          supportsFunctionCalling: true,
+          providerId: 'openai',
+          modelType: 'chat' as const,
+          isLocal: false,
+        },
+        {
+          id: 'gpt-3.5-turbo',
+          name: 'GPT-3.5 Turbo',
+          description: 'Fast and efficient model',
+          maxTokens: 4096,
+          costPerToken: 0.000002,
+          contextWindow: 4096,
+          supportsImages: false,
+          supportsFunctionCalling: true,
+          providerId: 'openai',
+          modelType: 'chat' as const,
+          isLocal: false,
+        },
+      ],
+      anthropic: [
+        {
+          id: 'claude-3-5-sonnet-20241022',
+          name: 'Claude 3.5 Sonnet',
+          description: 'Most capable Claude model',
+          maxTokens: 8192,
+          costPerToken: 0.000015,
+          contextWindow: 200000,
+          supportsImages: true,
+          supportsFunctionCalling: true,
+          providerId: 'anthropic',
+          modelType: 'chat' as const,
+          isLocal: false,
+        },
+        {
+          id: 'claude-3-haiku-20240307',
+          name: 'Claude 3 Haiku',
+          description: 'Fast and lightweight Claude model',
+          maxTokens: 4096,
+          costPerToken: 0.000001,
+          contextWindow: 200000,
+          supportsImages: true,
+          supportsFunctionCalling: true,
+          providerId: 'anthropic',
+          modelType: 'chat' as const,
+          isLocal: false,
+        },
+      ],
+      google: [
+        {
+          id: 'gemini-1.5-flash',
+          name: 'Gemini 1.5 Flash',
+          description: 'Fast and efficient Google model',
+          maxTokens: 8192,
+          costPerToken: 0.00000075,
+          contextWindow: 1000000,
+          supportsImages: true,
+          supportsFunctionCalling: true,
+          providerId: 'google',
+          modelType: 'chat' as const,
+          isLocal: false,
+        },
+        {
+          id: 'gemini-1.5-pro',
+          name: 'Gemini 1.5 Pro',
+          description: 'Most capable Google model',
+          maxTokens: 8192,
+          costPerToken: 0.0000035,
+          contextWindow: 2000000,
+          supportsImages: true,
+          supportsFunctionCalling: true,
+          providerId: 'google',
+          modelType: 'chat' as const,
+          isLocal: false,
+        },
+      ],
+    };
+
+    return mockModels[params.providerId] || [];
   }
 
   // Local Models (mock for web environment)
