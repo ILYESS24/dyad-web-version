@@ -1,5 +1,7 @@
 // Web API client to replace IPC client functionality
 
+import { isWeb } from '../utils/environment';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 class WebApiClient {
@@ -16,6 +18,12 @@ class WebApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    // In web environment, use localStorage instead of API calls
+    if (isWeb()) {
+      console.log('Web environment detected, using localStorage instead of API call to:', endpoint);
+      return this.mockApiResponse<T>(endpoint, options);
+    }
+
     const url = `${API_BASE_URL}${endpoint}`;
     
     const response = await fetch(url, {
@@ -39,6 +47,157 @@ class WebApiClient {
     return response.json();
   }
 
+  private async mockApiResponse<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    // Mock responses for web environment using localStorage
+    console.log('Mocking API response for:', endpoint);
+    
+    switch (endpoint) {
+      case '/apps':
+        return this.getMockApps() as T;
+      case '/settings':
+        return this.getMockSettings() as T;
+      case '/env-vars':
+        return this.getMockEnvVars() as T;
+      default:
+        if (endpoint.startsWith('/apps/') && endpoint.endsWith('/files')) {
+          return this.getMockAppFiles() as T;
+        }
+        if (endpoint.startsWith('/apps/') && options.method === 'GET') {
+          return this.getMockApp() as T;
+        }
+        return {} as T;
+    }
+  }
+
+  private getMockApps(): { apps: any[]; appBasePath: string } {
+    const storedApps = localStorage.getItem('dyad_apps');
+    const apps = storedApps ? JSON.parse(storedApps) : [];
+    
+    return {
+      apps,
+      appBasePath: '/mock-apps'
+    };
+  }
+
+  private getMockSettings(): any {
+    const storedSettings = localStorage.getItem('dyad_user_settings');
+    if (storedSettings) {
+      return JSON.parse(storedSettings);
+    }
+    
+    // Default settings for web environment
+    return {
+      providerSettings: {
+        openai: {
+          apiKey: {
+            value: import.meta.env.VITE_OPENAI_API_KEY || "sk-proj-YOUR_OPENAI_API_KEY_HERE"
+          }
+        },
+        anthropic: {
+          apiKey: {
+            value: import.meta.env.VITE_ANTHROPIC_API_KEY || "sk-ant-YOUR_ANTHROPIC_API_KEY_HERE"
+          }
+        },
+        google: {
+          apiKey: {
+            value: import.meta.env.VITE_GOOGLE_API_KEY || "YOUR_GOOGLE_API_KEY_HERE"
+          }
+        }
+      },
+      defaultProvider: "openai",
+      defaultModel: "gpt-4o",
+      autoApprove: true,
+      telemetryEnabled: false,
+      autoUpdateEnabled: false,
+    };
+  }
+
+  private getMockEnvVars(): any {
+    const storedEnvVars = localStorage.getItem('dyad_env_vars');
+    if (storedEnvVars) {
+      return JSON.parse(storedEnvVars);
+    }
+    
+    // Default environment variables for web environment
+    return {
+      OPENAI_API_KEY: import.meta.env.VITE_OPENAI_API_KEY || "sk-proj-YOUR_OPENAI_API_KEY_HERE",
+      ANTHROPIC_API_KEY: import.meta.env.VITE_ANTHROPIC_API_KEY || "sk-ant-YOUR_ANTHROPIC_API_KEY_HERE",
+      GOOGLE_API_KEY: import.meta.env.VITE_GOOGLE_API_KEY || "YOUR_GOOGLE_API_KEY_HERE",
+    };
+  }
+
+  private getMockApp(): any {
+    return {
+      id: 1,
+      name: "Mon Premier App Web",
+      description: "Application créée dans l'environnement web",
+      files: {
+        "package.json": JSON.stringify({
+          name: "mon-app-web",
+          version: "1.0.0",
+          scripts: {
+            dev: "vite",
+            build: "vite build"
+          },
+          dependencies: {
+            react: "^18.0.0",
+            "react-dom": "^18.0.0"
+          }
+        }, null, 2),
+        "src/App.tsx": `import React from 'react';
+
+export default function App() {
+  return (
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>🚀 Mon App Web</h1>
+      <p>Cette application fonctionne dans le navigateur !</p>
+      <button 
+        onClick={() => alert('Salut depuis le web !')}
+        style={{
+          padding: '10px 20px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer'
+        }}
+      >
+        Cliquer ici
+      </button>
+    </div>
+  );
+}`,
+        "src/main.tsx": `import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);`,
+        "index.html": `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon App Web</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>`
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  private getMockAppFiles(): any {
+    return this.getMockApp().files;
+  }
+
   // App management
   async listApps() {
     return this.request<{ apps: any[]; appBasePath: string }>('/apps');
@@ -47,6 +206,86 @@ class WebApiClient {
   // getApp method moved to web environment section below
 
   async createApp(params: { name?: string }) {
+    if (isWeb()) {
+      // Create app in localStorage for web environment
+      const storedApps = localStorage.getItem('dyad_apps');
+      const apps = storedApps ? JSON.parse(storedApps) : [];
+      
+      const newApp = {
+        id: apps.length + 1,
+        name: params.name || "Nouvelle App Web",
+        description: "Application créée dans l'environnement web",
+        files: {
+          "package.json": JSON.stringify({
+            name: params.name?.toLowerCase().replace(/\s+/g, '-') || "nouvelle-app-web",
+            version: "1.0.0",
+            scripts: {
+              dev: "vite",
+              build: "vite build"
+            },
+            dependencies: {
+              react: "^18.0.0",
+              "react-dom": "^18.0.0"
+            }
+          }, null, 2),
+          "src/App.tsx": `import React from 'react';
+
+export default function App() {
+  return (
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>🚀 ${params.name || "Nouvelle App"}</h1>
+      <p>Bienvenue dans votre nouvelle application web !</p>
+      <button 
+        onClick={() => alert('Salut depuis le web !')}
+        style={{
+          padding: '10px 20px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer'
+        }}
+      >
+        Cliquer ici
+      </button>
+    </div>
+  );
+}`,
+          "src/main.tsx": `import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);`,
+          "index.html": `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${params.name || "Nouvelle App"}</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>`
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      apps.push(newApp);
+      localStorage.setItem('dyad_apps', JSON.stringify(apps));
+      
+      return {
+        app: newApp,
+        chatId: 1 // Mock chat ID for web environment
+      };
+    }
+    
     return this.request<{ app: any; chatId: number }>('/apps', {
       method: 'POST',
       body: JSON.stringify(params),
@@ -229,6 +468,10 @@ class WebApiClient {
 
   // Settings management (using localStorage for web environment)
   async getUserSettings() {
+    if (isWeb()) {
+      return this.getMockSettings();
+    }
+    
     // Import localStorage utils dynamically to avoid circular imports
     const { localStorageUtils } = await import('../utils/localStorage');
     
@@ -237,6 +480,11 @@ class WebApiClient {
   }
 
   async setUserSettings(settings: any) {
+    if (isWeb()) {
+      localStorage.setItem('dyad_user_settings', JSON.stringify(settings));
+      return settings;
+    }
+    
     // Import localStorage utils dynamically to avoid circular imports
     const { localStorageUtils } = await import('../utils/localStorage');
     
@@ -250,6 +498,10 @@ class WebApiClient {
   }
 
   async getEnvVars() {
+    if (isWeb()) {
+      return this.getMockEnvVars();
+    }
+    
     // Import localStorage utils dynamically to avoid circular imports
     const { localStorageUtils } = await import('../utils/localStorage');
     
