@@ -48,7 +48,48 @@ export function useSettings() {
       setError(null);
     } catch (error) {
       console.error("Error loading initial data:", error);
-      setError(error instanceof Error ? error : new Error(String(error)));
+      
+      // In web environment or if API fails, use mock data instead of showing error
+      const { isWeb } = await import('@/utils/environment');
+      if (isWeb()) {
+        console.log('Using mock settings in web environment due to API error');
+        const mockSettings = {
+          providerSettings: {
+            openai: {
+              apiKey: {
+                value: import.meta.env.VITE_OPENAI_API_KEY || "sk-proj-YOUR_OPENAI_API_KEY_HERE"
+              }
+            },
+            anthropic: {
+              apiKey: {
+                value: import.meta.env.VITE_ANTHROPIC_API_KEY || "sk-ant-YOUR_ANTHROPIC_API_KEY_HERE"
+              }
+            },
+            google: {
+              apiKey: {
+                value: import.meta.env.VITE_GOOGLE_API_KEY || "YOUR_GOOGLE_API_KEY_HERE"
+              }
+            }
+          },
+          defaultProvider: "openai",
+          defaultModel: "gpt-4o",
+          autoApprove: true,
+          telemetryEnabled: false,
+          autoUpdateEnabled: false,
+        };
+        
+        const mockEnvVars = {
+          OPENAI_API_KEY: import.meta.env.VITE_OPENAI_API_KEY || "sk-proj-YOUR_OPENAI_API_KEY_HERE",
+          ANTHROPIC_API_KEY: import.meta.env.VITE_ANTHROPIC_API_KEY || "sk-ant-YOUR_ANTHROPIC_API_KEY_HERE",
+          GOOGLE_API_KEY: import.meta.env.VITE_GOOGLE_API_KEY || "YOUR_GOOGLE_API_KEY_HERE",
+        };
+        
+        setSettingsAtom(mockSettings);
+        setEnvVarsAtom(mockEnvVars);
+        setError(null);
+      } else {
+        setError(error instanceof Error ? error : new Error(String(error)));
+      }
     } finally {
       setLoading(false);
     }
