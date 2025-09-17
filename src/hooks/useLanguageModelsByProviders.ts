@@ -17,8 +17,9 @@ export function useLanguageModelsByProviders() {
       try {
         return await ipcClient.getLanguageModelsByProviders();
       } catch (error) {
-        // In web environment, return mock models instead of throwing error
-        if (isWeb()) {
+        // ALWAYS return mock models in browser environment - FORCE IT!
+        const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+        if (isBrowser) {
           console.log('Using mock language models in web environment due to API error');
           return {
             openai: [

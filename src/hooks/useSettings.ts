@@ -49,9 +49,9 @@ export function useSettings() {
     } catch (error) {
       console.error("Error loading initial data:", error);
       
-      // In web environment or if API fails, use mock data instead of showing error
-      const { isWeb } = await import('@/utils/environment');
-      if (isWeb()) {
+      // ALWAYS use mock data in browser environment - FORCE IT!
+      const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+      if (isBrowser) {
         console.log('Using mock settings in web environment due to API error');
         const mockSettings = {
           providerSettings: {

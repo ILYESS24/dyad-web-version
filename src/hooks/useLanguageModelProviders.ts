@@ -15,8 +15,9 @@ export function useLanguageModelProviders() {
       try {
         return await ipcClient.getLanguageModelProviders();
       } catch (error) {
-        // In web environment, return mock providers instead of throwing error
-        if (isWeb()) {
+        // ALWAYS return mock providers in browser environment - FORCE IT!
+        const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+        if (isBrowser) {
           console.log('Using mock language model providers in web environment due to API error');
           return [
             {

@@ -18,16 +18,11 @@ class WebApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    // Force mock responses in web environment - check multiple conditions
-    const isWebEnvironment = isWeb() || 
-                            (typeof window !== 'undefined' && 
-                             (window.location?.hostname?.includes('vercel.app') ||
-                              window.location?.hostname?.includes('netlify.app') ||
-                              window.location?.hostname?.includes('github.io') ||
-                              window.location?.hostname?.includes('localhost')));
-
-    if (isWebEnvironment) {
-      console.log('Web environment detected, using localStorage instead of API call to:', endpoint);
+    // ALWAYS use mock responses in browser environment - FORCE IT!
+    const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+    
+    if (isBrowser) {
+      console.log('Browser environment detected, FORCING mock response for:', endpoint);
       return this.mockApiResponse<T>(endpoint, options);
     }
 
@@ -99,13 +94,21 @@ class WebApiClient {
   }
 
   private getMockSettings(): any {
-    const storedSettings = localStorage.getItem('dyad_user_settings');
-    if (storedSettings) {
-      return JSON.parse(storedSettings);
+    console.log('Getting mock settings - checking localStorage first');
+    
+    try {
+      const storedSettings = localStorage.getItem('dyad_user_settings');
+      if (storedSettings) {
+        const parsed = JSON.parse(storedSettings);
+        console.log('✅ Found stored settings in localStorage:', parsed);
+        return parsed;
+      }
+    } catch (error) {
+      console.log('Error parsing stored settings, using defaults');
     }
     
-    // Default settings for web environment
-    return {
+    // Default settings for web environment - FORCE VALID DATA
+    const defaultSettings = {
       providerSettings: {
         openai: {
           apiKey: {
@@ -129,6 +132,9 @@ class WebApiClient {
       telemetryEnabled: false,
       autoUpdateEnabled: false,
     };
+    
+    console.log('✅ Using default mock settings:', defaultSettings);
+    return defaultSettings;
   }
 
   private getMockEnvVars(): any {
@@ -487,7 +493,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
   // Settings management (using localStorage for web environment)
   async getUserSettings() {
-    if (isWeb()) {
+    // ALWAYS use mock settings in browser environment
+    const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+    
+    if (isBrowser) {
+      console.log('Browser environment detected, FORCING mock settings');
       return this.getMockSettings();
     }
     
@@ -648,10 +658,31 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
   // Update provider API key (web environment)
   async updateProviderApiKey(provider: string, apiKey: string): Promise<void> {
-    const { localStorageUtils } = await import('../utils/localStorage');
+    console.log(`FORCING localStorage update for ${provider} API key in browser environment`);
     
-    console.log(`Updating ${provider} API key in localStorage for web environment`);
-    localStorageUtils.updateProviderApiKey(provider, apiKey);
+    // Direct localStorage update without imports - FORCE IT!
+    const storedSettings = localStorage.getItem('dyad_user_settings');
+    const settings = storedSettings ? JSON.parse(storedSettings) : {
+      providerSettings: {},
+      defaultProvider: "openai",
+      defaultModel: "gpt-4o",
+      autoApprove: true,
+      telemetryEnabled: false,
+      autoUpdateEnabled: false,
+    };
+    
+    if (!settings.providerSettings) {
+      settings.providerSettings = {};
+    }
+    
+    if (!settings.providerSettings[provider]) {
+      settings.providerSettings[provider] = {};
+    }
+    
+    settings.providerSettings[provider].apiKey = { value: apiKey };
+    localStorage.setItem('dyad_user_settings', JSON.stringify(settings));
+    
+    console.log(`✅ Successfully saved ${provider} API key to localStorage`);
   }
 
   // Delete provider API key (web environment)
