@@ -493,19 +493,24 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
   // Settings management (using localStorage for web environment)
   async getUserSettings() {
-    // ALWAYS use mock settings in browser environment
+    // ALWAYS use mock settings in browser environment - FORCE IT!
     const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
     
+    console.log('getUserSettings called - FORCING mock response in browser');
     if (isBrowser) {
-      console.log('Browser environment detected, FORCING mock settings');
-      return this.getMockSettings();
+      const mockSettings = this.getMockSettings();
+      console.log('✅ Returning mock settings:', mockSettings);
+      return mockSettings;
     }
     
-    // Import localStorage utils dynamically to avoid circular imports
-    const { localStorageUtils } = await import('../utils/localStorage');
-    
-    console.log('Loading user settings from localStorage for web environment');
-    return localStorageUtils.getUserSettings();
+    // Fallback for non-browser environments
+    try {
+      const { localStorageUtils } = await import('../utils/localStorage');
+      return localStorageUtils.getUserSettings();
+    } catch (error) {
+      console.log('Error in localStorage utils, using mock settings');
+      return this.getMockSettings();
+    }
   }
 
   async setUserSettings(settings: any) {
@@ -527,8 +532,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   }
 
   async getEnvVars() {
-    if (isWeb()) {
-      return this.getMockEnvVars();
+    const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+    
+    console.log('getEnvVars called - FORCING mock response in browser');
+    if (isBrowser) {
+      const mockEnvVars = this.getMockEnvVars();
+      console.log('✅ Returning mock env vars:', mockEnvVars);
+      return mockEnvVars;
     }
     
     // Import localStorage utils dynamically to avoid circular imports
@@ -712,18 +722,26 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   async getLanguageModels(): Promise<any[]>;
   async getLanguageModels(params: { providerId: string }): Promise<any[]>;
   async getLanguageModels(params?: { providerId: string }): Promise<any[]> {
-    if (!params) {
-      // Return all models from all providers
-      const allModels: any[] = [];
-      const providers = ['openai', 'anthropic', 'google'];
-      for (const provider of providers) {
-        const models = await this.getLanguageModels({ providerId: provider });
-        allModels.push(...models);
-      }
-      return allModels;
-    }
+    const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
     
-    console.log(`Loading language models for provider: ${params.providerId} in web environment`);
+    console.log('getLanguageModels called - FORCING mock response in browser');
+    
+    if (isBrowser) {
+      console.log('Browser environment detected, returning mock language models');
+      
+      if (!params) {
+        // Return all models from all providers
+        const allModels: any[] = [];
+        const providers = ['openai', 'anthropic', 'google'];
+        for (const provider of providers) {
+          const models = await this.getLanguageModels({ providerId: provider });
+          allModels.push(...models);
+        }
+        console.log('✅ Returning all mock models:', allModels.length);
+        return allModels;
+      }
+      
+      console.log(`Returning mock models for provider: ${params.providerId}`);
     
     // Return mock language models for web environment
     const mockModels: { [key: string]: any[] } = {
@@ -826,7 +844,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       ],
     };
 
-    return mockModels[params.providerId] || [];
+      const result = mockModels[params.providerId] || [];
+      console.log(`✅ Returning ${result.length} mock models for ${params.providerId}`);
+      return result;
+    }
+    
+    // Non-browser fallback
+    console.log('Non-browser environment, using fallback');
+    return [];
   }
 
   // Local Models (mock for web environment)
