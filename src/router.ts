@@ -1,20 +1,17 @@
 import { createRouter } from "@tanstack/react-router";
 import { rootRoute } from "./routes/root";
-import { homeRoute } from "./routes/home";
-import { chatRoute } from "./routes/chat";
-import { settingsRoute } from "./routes/settings";
-import { providerSettingsRoute } from "./routes/settings/providers/$provider";
-import { appDetailsRoute } from "./routes/app-details";
-import { hubRoute } from "./routes/hub";
-import { libraryRoute } from "./routes/library";
+import { Route as HomeRoute } from "./routes/rork-home";
+import { Route as MarketplaceRoute } from "./routes/marketplace";
+import { Route as BuilderRoute } from "./routes/builder";
+import { Route as DashboardRoute } from "./routes/dashboard";
+import { Route as ProfileRoute } from "./routes/profile";
 
 const routeTree = rootRoute.addChildren([
-  homeRoute,
-  hubRoute,
-  libraryRoute,
-  chatRoute,
-  appDetailsRoute,
-  settingsRoute.addChildren([providerSettingsRoute]),
+  HomeRoute,
+  MarketplaceRoute,
+  BuilderRoute,
+  DashboardRoute,
+  ProfileRoute,
 ]);
 
 // src/components/NotFoundRedirect.tsx

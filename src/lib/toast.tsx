@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { PostHog } from "posthog-js";
 import React from "react";
 import { CustomErrorToast } from "../components/CustomErrorToast";
@@ -76,7 +76,7 @@ export const showError = (message: any) => {
  * @param message The warning message to display
  */
 export const showWarning = (message: string) => {
-  toast.warning(message);
+  toast(message, { icon: '⚠️' });
   console.warn(message);
 };
 
@@ -85,7 +85,7 @@ export const showWarning = (message: string) => {
  * @param message The info message to display
  */
 export const showInfo = (message: string) => {
-  toast.info(message);
+  toast(message, { icon: 'ℹ️' });
 };
 
 /**
