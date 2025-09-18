@@ -1,7 +1,8 @@
-// Modified IPC client to use Web API instead of Electron IPC
+// Web-compatible IPC client
+// This file replaces all Node.js/Electron IPC functionality with web alternatives
 
-import WebApiClient from '../api/client.js';
+import WebApiClient from '../api/client';
 
-// Export the same interface as the original IPC client but use Web API
+// Export the web API client as the IPC client for compatibility
 export const IpcClient = WebApiClient;
 export default WebApiClient;

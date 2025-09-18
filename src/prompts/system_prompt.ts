@@ -1,8 +1,7 @@
-import path from "node:path";
-import fs from "node:fs";
-import log from "electron-log";
+// Web-compatible system prompt
+import { webLogger } from '../utils/web-logger';
 
-const logger = log.scope("system_prompt");
+const logger = webLogger.scope("system_prompt");
 
 export const THINKING_PROMPT = `
 # Thinking Process
