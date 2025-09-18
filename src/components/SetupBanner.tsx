@@ -46,6 +46,7 @@ export function SetupBanner() {
 
   // Don't show SetupBanner at all in web environment
   if (isWeb()) {
+    console.log('SetupBanner: Web environment detected, hiding banner');
     return null;
   }
   const checkNode = useCallback(async () => {

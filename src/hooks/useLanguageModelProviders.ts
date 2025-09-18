@@ -12,11 +12,45 @@ export function useLanguageModelProviders() {
   const queryResult = useQuery<LanguageModelProvider[], Error>({
     queryKey: ["languageModelProviders"],
     queryFn: async () => {
+      // ALWAYS return mock providers in browser environment - FORCE IT!
+      const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+      if (isBrowser) {
+        console.log('Using mock language model providers in web environment');
+        return [
+          {
+            id: 'openai',
+            name: 'OpenAI',
+            hasFreeTier: false,
+            websiteUrl: 'https://openai.com',
+            gatewayPrefix: 'openai',
+            type: 'cloud' as const,
+            envVarName: 'OPENAI_API_KEY',
+          },
+          {
+            id: 'anthropic',
+            name: 'Anthropic',
+            hasFreeTier: false,
+            websiteUrl: 'https://anthropic.com',
+            gatewayPrefix: 'anthropic',
+            type: 'cloud' as const,
+            envVarName: 'ANTHROPIC_API_KEY',
+          },
+          {
+            id: 'google',
+            name: 'Google',
+            hasFreeTier: true,
+            websiteUrl: 'https://ai.google.dev',
+            gatewayPrefix: 'google',
+            type: 'cloud' as const,
+            envVarName: 'GOOGLE_API_KEY',
+          },
+        ];
+      }
+      
       try {
         return await ipcClient.getLanguageModelProviders();
       } catch (error) {
-        // ALWAYS return mock providers in browser environment - FORCE IT!
-        const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+        // Fallback for non-browser environments
         if (isBrowser) {
           console.log('Using mock language model providers in web environment due to API error');
           return [

@@ -5,33 +5,24 @@ export function isElectron(): boolean {
 }
 
 export function isWeb(): boolean {
-  // More robust web detection
+  // Force web environment detection for Vercel deployment
   if (typeof window === 'undefined') return false;
   
-  // Check if we're in a browser environment
+  // Always return true if we're in a browser (since we removed all Node.js dependencies)
   const isBrowser = typeof window !== 'undefined' && 
                    typeof document !== 'undefined' && 
                    typeof navigator !== 'undefined';
   
-  // Check if we're NOT in Electron
-  const isNotElectron = !isElectron();
-  
-  // Additional check: if we're running on Vercel or in a web deployment
-  const isWebDeployment = typeof window !== 'undefined' && 
-                         (window.location?.hostname?.includes('vercel.app') ||
-                          window.location?.hostname?.includes('netlify.app') ||
-                          window.location?.hostname?.includes('github.io'));
-  
-  const result = isBrowser && isNotElectron;
+  // Since we removed all Node.js dependencies, if we're in a browser, we're in web mode
+  const result = isBrowser;
   
   // Debug logging for troubleshooting
   if (typeof window !== 'undefined' && window.console) {
-    console.log('Environment detection:', {
+    console.log('Environment detection (FORCED WEB):', {
       isBrowser,
-      isNotElectron,
-      isWebDeployment,
       result,
-      hostname: window.location?.hostname
+      hostname: window.location?.hostname,
+      userAgent: navigator?.userAgent
     });
   }
   
