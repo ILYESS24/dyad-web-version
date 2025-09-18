@@ -6,7 +6,7 @@ import { IpcClient } from "@/ipc/ipc_client";
 import { generateCuteAppName } from "@/lib/utils";
 import { useLoadApps } from "@/hooks/useLoadApps";
 import { useSettings } from "@/hooks/useSettings";
-import { SetupBanner } from "@/components/SetupBanner";
+// SetupBanner removed - web-only interface
 import { isWeb } from "@/utils/environment";
 import { isPreviewOpenAtom } from "@/atoms/viewAtoms";
 import { useState, useEffect, useCallback } from "react";
@@ -183,7 +183,7 @@ export default function HomePage() {
   // Main Home Page Content
   return (
     <div className="flex flex-col items-center justify-center max-w-3xl m-auto p-8">
-      {!isWeb() && <SetupBanner />}
+      {/* SetupBanner removed - web-only interface */}
 
       <div className="w-full">
         <ImportAppButton />

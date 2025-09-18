@@ -57,7 +57,7 @@ export const MessagesList = forwardRef<HTMLDivElement, MessagesListProps>(
             <div className="flex flex-1 items-center justify-center text-gray-500">
               No messages yet
             </div>
-            {!isAnyProviderSetup() && !isWeb() && <SetupBanner />}
+            {/* SetupBanner removed - web-only interface */}
           </div>
         )}
         {!isStreaming && (

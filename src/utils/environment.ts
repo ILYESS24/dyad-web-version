@@ -29,12 +29,12 @@ export function isWeb(): boolean {
   return result;
 }
 
+// Node.js detection removed - we're web-only now
 export function isNode(): boolean {
-  return typeof process !== 'undefined' && process.versions && process.versions.node;
+  return false; // Always false since we removed all Node.js
 }
 
 export function getEnvironment(): 'electron' | 'web' | 'node' {
   if (isElectron()) return 'electron';
-  if (isNode()) return 'node';
-  return 'web';
+  return 'web'; // Always web since we removed Node.js
 }
