@@ -331,6 +331,65 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   }
 
   async runApp(appId: number, onOutput?: (output: any) => void): Promise<void> {
+    const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+    
+    if (isBrowser) {
+      console.log(`[WebRuntime] Running app ${appId} using web alternatives`);
+      
+      try {
+        // Import des alternatives web
+        const { VirtualFileSystem } = await import('../utils/virtual-file-system');
+        const { WebCodeExecutor } = await import('../utils/web-code-executor');
+        
+        // Créer le système de fichiers virtuel
+        const vfs = new VirtualFileSystem(appId.toString());
+        
+        // Créer l'exécuteur de code
+        const executor = new WebCodeExecutor(vfs);
+        
+        // Exécuter l'application
+        const result = await executor.runApp();
+        
+        if (result.success) {
+          console.log(`✅ App ${appId} running successfully in web environment`);
+          if (onOutput) {
+            onOutput({
+              message: `App ${appId} is running in web environment`,
+              type: 'stdout',
+              appId,
+              timestamp: Date.now(),
+              url: `#/app/${appId}`,
+              logs: result.logs,
+              duration: result.duration
+            });
+          }
+        } else {
+          console.error(`❌ App ${appId} failed to run: ${result.error}`);
+          if (onOutput) {
+            onOutput({
+              message: `Failed to run app: ${result.error}`,
+              type: 'stderr',
+              appId,
+              timestamp: Date.now(),
+              logs: result.logs
+            });
+          }
+        }
+      } catch (error) {
+        console.error(`❌ Web runtime error: ${error}`);
+        if (onOutput) {
+          onOutput({
+            message: `Web runtime error: ${error instanceof Error ? error.message : String(error)}`,
+            type: 'stderr',
+            appId,
+            timestamp: Date.now()
+          });
+        }
+      }
+      return;
+    }
+    
+    // Fallback pour non-browser
     try {
       // Get app files from the database
       const app = await this.request<any>(`/apps/${appId}`);
